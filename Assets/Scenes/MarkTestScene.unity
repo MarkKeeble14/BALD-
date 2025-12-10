@@ -653,7 +653,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scrollSpeed: 1
   scrollAxis: {x: -1, y: 0}
-  rateOfSpeedIncrease: 0.001
+  rateOfSpeedIncrease: 0.00025
   thingToMove: {fileID: 1919589552}
 --- !u!114 &1919589554
 MonoBehaviour:
@@ -668,7 +668,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cullAfterXPos: -18
-  repositionToXPos: 13.5
+  tileWidth: 4.5
   backgroundComponents:
   - {fileID: 112911767}
   - {fileID: 1653057158}
@@ -840,18 +840,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7bfac1c32f649bf468509e3a2d3a612e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sideMovementForce: 3
+  sideMovementForce: 3.5
   minX: -9.5
   maxX: 9.5
+  sprintingSpeedMult: 2
+  slidingSpeedMult: 0.4
   numJumps: 2
-  jumpForce: 0.2
-  mass: 1
+  jumpForce: 0.03
+  mass: 0.3
   forceOfGravity: 0.75
   onGroundRaycastDistance: 0.55
-  ground:
-    serializedVersion: 2
-    m_Bits: 64
   minY: -5
+  holdToIncreaseJumpHeightTimer:
+    duration: 0.15
+  onHoldAddedJumpForce: 0.25
 --- !u!1001 &5746297317945172153
 PrefabInstance:
   m_ObjectHideFlags: 0

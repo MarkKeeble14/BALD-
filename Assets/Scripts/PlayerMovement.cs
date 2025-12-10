@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -7,19 +8,30 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float minX;
     [SerializeField] private float maxX;
 
+    [Header("Sprint")]
+    [SerializeField] private float sprintingSpeedMult = 1f;
+    private bool isSprinting => Input.GetKey(KeyCode.LeftShift);
+
+    [Header("Slide")]
+    [SerializeField] private float slidingSpeedMult;
+    private bool isSliding;
+
     [Header("Vertical Movement")]
     [SerializeField] private int numJumps = 1;
     [SerializeField] private float jumpForce;
     [SerializeField] private float mass;
     [SerializeField] private float forceOfGravity;
     [SerializeField] private float onGroundRaycastDistance;
-    [SerializeField] private LayerMask ground;
     [SerializeField] private float minY;
     private float upwardsVelocity;
     private int curNumJumps;
     private bool onGround => transform.position.y <= minY;
 
     private Vector3 amountToMove;
+
+    [Header("Hold to Increase Jump System")]
+    [SerializeField] private Timer holdToIncreaseJumpHeightTimer;
+    [SerializeField] private float onHoldAddedJumpForce;
 
     private void Awake()
     {
@@ -29,20 +41,27 @@ public class PlayerMovement : MonoBehaviour
 
     private void SidewaysMovement()
     {
-        // Reset variables
+        // Reset variables from last frame
         amountToMove.x = 0;
 
         // Move Left
         if (Input.GetKey(KeyCode.A))
         {
-            amountToMove.x = -sideMovementForce;
+            amountToMove.x += -sideMovementForce;
         }
+
         // Move Right
         if (Input.GetKey(KeyCode.D))
         {
-            amountToMove.x = sideMovementForce;
+            amountToMove.x += sideMovementForce;
         }
-        transform.position += amountToMove * Time.deltaTime;
+
+        // Add the direction to the players position
+        // Take into account whether the player is sprinting or not 
+        transform.position += amountToMove 
+            * (Input.GetKey(KeyCode.LeftShift) ? sprintingSpeedMult : 1) 
+            * (isSliding ? slidingSpeedMult : 1)
+            * Time.deltaTime;
 
         // Clamp the transform to bounds
         if (transform.position.x < minX)
@@ -52,6 +71,18 @@ public class PlayerMovement : MonoBehaviour
         if (transform.position.x > maxX)
         {
             transform.position = new Vector3(maxX, transform.position.y, transform.position.z);
+        }
+
+        // Slide
+        if (Input.GetKey(KeyCode.LeftControl))
+        {
+            if (amountToMove.x !=0)
+            {
+                isSliding = true;
+            }
+        } else
+        {
+            isSliding = false;
         }
     }
 
@@ -77,7 +108,20 @@ public class PlayerMovement : MonoBehaviour
 
                 // Remove a jump
                 curNumJumps--;
+
+                // Begin hold to increase jump height timer
+                holdToIncreaseJumpHeightTimer.Reset();
             }
+        }
+
+        // Update hold to increase jump height timer
+        if (!holdToIncreaseJumpHeightTimer.TimesUp)
+        {
+            if (Input.GetKey(KeyCode.Space))
+            {
+                upwardsVelocity += onHoldAddedJumpForce * Time.deltaTime;
+            }
+            holdToIncreaseJumpHeightTimer.Update();
         }
 
         // if you are not on the ground, gravity applies

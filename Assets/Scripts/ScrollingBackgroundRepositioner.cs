@@ -4,11 +4,14 @@ public class ScrollingBackgroundRepositioner : MonoBehaviour
 {
     [Header("Settings")]
     [SerializeField] private float cullAfterXPos;
-    [SerializeField] private float repositionToXPos;
+    [SerializeField] private float tileWidth;
 
     [Header("References")]
     [SerializeField] private Transform[] backgroundComponents;
-    
+
+    // Used to store the last child of the row
+    private Transform lastChild;
+
     // Update is called once per frame
     void Update()
     {
@@ -18,8 +21,11 @@ public class ScrollingBackgroundRepositioner : MonoBehaviour
             // Check if the component is past a certain threshold (x pos)
             if (t.position.x < cullAfterXPos)
             {
-                // Move the component to the end of the row
-                t.position = new Vector3(repositionToXPos, t.position.y, t.position.z);
+                lastChild = t.parent.GetChild(t.parent.childCount - 1);
+
+                // Update the position and move the component to the end of the row
+                t.position = lastChild.position + new Vector3(tileWidth, 0, 0);
+                t.SetAsLastSibling();
             }
         }
     }
