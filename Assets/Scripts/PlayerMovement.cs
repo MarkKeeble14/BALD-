@@ -44,18 +44,6 @@ public class PlayerMovement : MonoBehaviour
         // Reset variables from last frame
         amountToMove.x = 0;
 
-        // Move Left
-        if (Input.GetKey(KeyCode.A))
-        {
-            amountToMove.x += -sideMovementForce;
-        }
-
-        // Move Right
-        if (Input.GetKey(KeyCode.D))
-        {
-            amountToMove.x += sideMovementForce;
-        }
-
         // Add the direction to the players position
         // Take into account whether the player is sprinting or not 
         transform.position += amountToMove 
@@ -132,7 +120,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // Apply vertical movement
-        transform.position += new Vector3(0, upwardsVelocity, 0);
+        transform.position += new Vector3(0, upwardsVelocity, 0) * Time.deltaTime;
 
         // Clamp to range
         if (transform.position.y < minY)
