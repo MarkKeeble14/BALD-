@@ -25,9 +25,24 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float minY;
     private float upwardsVelocity;
     private int curNumJumps;
-    private bool onGround => transform.position.y <= minY;
+    private bool onGround => !hasFallen && transform.position.y <= minY;
+
+    [Header("Falling")]
+    [SerializeField] private LayerMask checkForPitMask;
+    [SerializeField] private LayerMask pitMask;
+    [SerializeField] private float isFallingFeelersRange;
+    [SerializeField] private float isFallingFeelersArc;
+    [SerializeField] private int isFallingNumFeelers;
+    private bool hasFallen;
 
     private Vector3 amountToMove;
+
+    [Header("Parry Strike")]
+    [SerializeField] private float parryRange;
+    [SerializeField] private float parryPower;
+    [SerializeField] private float parryArc;
+    [SerializeField] private int parryNumFeelers;
+    [SerializeField] private LayerMask hazards;
 
     [Header("Hold to Increase Jump System")]
     [SerializeField] private Timer holdToIncreaseJumpHeightTimer;
@@ -39,10 +54,23 @@ public class PlayerMovement : MonoBehaviour
         curNumJumps = numJumps;
     }
 
+    // No longer being used
     private void SidewaysMovement()
     {
         // Reset variables from last frame
         amountToMove.x = 0;
+
+        // Move Left
+        if (Input.GetKey(KeyCode.A))
+        {
+            amountToMove.x += -sideMovementForce;
+        }
+
+        // Move Right
+        if (Input.GetKey(KeyCode.D))
+        {
+            amountToMove.x += sideMovementForce;
+        }
 
         // Add the direction to the players position
         // Take into account whether the player is sprinting or not 
@@ -74,6 +102,26 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    private void ParryStrike()
+    {
+        // If the game manager says don't allow input, don't!
+        if (GameManager._Instance.BlockInput) return;
+
+        // Parry downwards
+        if (Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            for (int i = -parryNumFeelers; i <= parryNumFeelers; i++)
+            {
+                RaycastHit2D hit = Physics2D.Raycast(transform.position, new Vector2(i * parryArc, -1), parryRange, hazards);
+                if (hit.collider != null && hit.collider.CompareTag("Parryable"))
+                {
+                    upwardsVelocity = parryPower;
+                    return;
+                }
+            }
+        }
+    }
+
     private void JumpingMovement()
     {
         // if falling and landing on ground, zero out velocity and replenish jumps
@@ -89,7 +137,7 @@ public class PlayerMovement : MonoBehaviour
         // If have a jump remaining, allow player to jump
         if (curNumJumps > 0)
         {
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (!GameManager._Instance.BlockInput && Input.GetKeyDown(KeyCode.Space))
             {
                 // Set upwards velocity based on jump force
                 upwardsVelocity = jumpForce;
@@ -105,7 +153,7 @@ public class PlayerMovement : MonoBehaviour
         // Update hold to increase jump height timer
         if (!holdToIncreaseJumpHeightTimer.TimesUp)
         {
-            if (Input.GetKey(KeyCode.Space))
+            if (!GameManager._Instance.BlockInput && Input.GetKey(KeyCode.Space))
             {
                 upwardsVelocity += onHoldAddedJumpForce * Time.deltaTime;
             }
@@ -122,17 +170,43 @@ public class PlayerMovement : MonoBehaviour
         // Apply vertical movement
         transform.position += new Vector3(0, upwardsVelocity, 0) * Time.deltaTime;
 
-        // Clamp to range
+        // Clamp to range, only if player hasn't fallen
+        if (hasFallen) return;
         if (transform.position.y < minY)
         {
             transform.position = new Vector3(transform.position.x, minY, transform.position.z);
         }
     }
 
+    private void CheckIfHasFallen()
+    {
+        if (transform.position.y > minY) return;
+        if (hasFallen) return;
+
+        // Probe underneath the player several times
+        for (int i = -isFallingNumFeelers; i <= isFallingNumFeelers; i++)
+        {
+            // For each probe
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, new Vector2(i * isFallingFeelersArc, -1),
+                isFallingFeelersRange, checkForPitMask);
+
+            // We check if we hit something, and if so, check if it is not pit
+            if (hit.collider != null && !LayerMaskHelper.IsInLayerMask(hit.collider.gameObject, pitMask))
+            {
+                // As long as we hit anything that isn't a pit, we haven't yet fallen
+                return;
+            }
+        }
+
+        // We went through all probes and hit nothing but pit, therefore we have fallen and should trigger die state
+        hasFallen = true;
+        GameManager._Instance.DieState();
+    }
+
     private void Update()
     {
-        SidewaysMovement();
-
+        CheckIfHasFallen();
         JumpingMovement();
+        ParryStrike();
     }
 }

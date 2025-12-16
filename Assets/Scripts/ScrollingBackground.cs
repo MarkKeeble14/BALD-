@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class ScrollingBackground : MonoBehaviour
@@ -14,6 +15,10 @@ public class ScrollingBackground : MonoBehaviour
     [SerializeField] private float cullAfterXPos;
     [SerializeField] private float tileWidth;
 
+    [Header("Slowing Sequence")]
+    [SerializeField] private float minSlowedSpeedToHardStop = 1;
+    [SerializeField] private float slowRate = 1;
+
     // Used to store the last child of the row
     private Transform lastChild;
 
@@ -22,10 +27,26 @@ public class ScrollingBackground : MonoBehaviour
     // Automatically rounds the distance down to the nearest int
     public float DistanceTravelled { get { return Mathf.FloorToInt(distanceTravelled); } }
 
+    private bool stopScroll;
+
+    [SerializeField] private Vector2 chanceToDisableOnReposition;
+    private bool allowFloorToBeDisabled;
+
     private void Update()
     {
-        // Increase the speed of the stage
-        currentIncrease += rateOfSpeedIncrease;
+        if (stopScroll)
+        {
+            scrollSpeed = Mathf.Lerp(scrollSpeed, 0, slowRate * Time.deltaTime);
+            if (scrollSpeed < minSlowedSpeedToHardStop)
+            {
+                scrollSpeed = 0;
+            }
+        }
+        else
+        {
+            // Increase the speed of the stage
+            currentIncrease += rateOfSpeedIncrease;
+        }
 
         // Calculate how much to scroll by
         // scrollSpeed = the base scroll speed
@@ -35,13 +56,13 @@ public class ScrollingBackground : MonoBehaviour
 
         // Apply scrolling to everything needed to scroll
         Transform scrollingTransform;
-        TrackAttachedHazards trackAttachedHazards;
+        BackgroundTile tile;
         foreach (ScrollPosition toScroll in stageScrollers)
         {
             toScroll.Scroll(scrollByAmount);
 
             scrollingTransform = toScroll.transform;
-            trackAttachedHazards = toScroll.GetComponent<TrackAttachedHazards>();
+            tile = toScroll.GetComponent<BackgroundTile>();
 
             // Check if the component is past a certain threshold (x pos)
             if (scrollingTransform.position.x < cullAfterXPos)
@@ -53,12 +74,22 @@ public class ScrollingBackground : MonoBehaviour
                 scrollingTransform.SetAsLastSibling();
 
                 // Destroys all hazards attached to repositioned column
-                trackAttachedHazards.AnnihilateHazards();
+                // Also disables the floor if told to do so
+                // Also does whatever else is needed
+                    tile.OnReposition(allowFloorToBeDisabled ? 
+                        RandomHelper.RandomBool(chanceToDisableOnReposition.x / chanceToDisableOnReposition.y) : 
+                        false);
+                allowFloorToBeDisabled = !allowFloorToBeDisabled;
             }
         }
 
         // Tell the GameManager how much distance has been travelled this frame
         // Only ever moving one direction, so taking the absolute value of the movement
         GameManager._Instance.TrackDistance(Mathf.Abs(scrollByAmount.x));
+    }
+
+    public void InitiateSlowToAStop()
+    {
+        stopScroll = true;
     }
 }

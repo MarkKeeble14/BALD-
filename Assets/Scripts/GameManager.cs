@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -14,8 +15,18 @@ public class GameManager : MonoBehaviour
     private float distanceTravelledLastFrame;
     public float DistanceTravelledLastFrame => distanceTravelledLastFrame;
 
+    [Header("References")]
+    [SerializeField] private ScrollingBackground scrollingBackground;
+
     [Header("UI References")]
     [SerializeField] private TMPFloatDisplay distanceTravelledDisplay;
+
+
+    [Header("Died UI")]
+    [SerializeField] private TMPFloatDisplay diedDistanceTravelledDisplay;
+    [SerializeField] private GameObject diedUI;
+
+    public bool BlockInput { get; private set; }
 
     private void Awake()
     {
@@ -38,5 +49,18 @@ public class GameManager : MonoBehaviour
     private void UpdateUI()
     {
         distanceTravelledDisplay.SetFloat(DistanceTravelled);
+        diedDistanceTravelledDisplay.SetFloat(DistanceTravelled);
+    }
+
+    public void DieState()
+    {
+        BlockInput = true;
+        diedUI.SetActive(true);
+        scrollingBackground.InitiateSlowToAStop();
+    }
+
+    public void Restart()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }

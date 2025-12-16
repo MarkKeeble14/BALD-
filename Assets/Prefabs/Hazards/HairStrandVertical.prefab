@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 864683710005763357}
   m_Layer: 8
   m_Name: StringBetween
-  m_TagString: Untagged
+  m_TagString: Parryable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -28,7 +28,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.25, y: 10, z: 1}
+  m_LocalScale: {x: 0.25, y: 2.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5272946693080356949}
@@ -145,7 +145,7 @@ GameObject:
   - component: {fileID: 5272946693080356949}
   - component: {fileID: 1800976971117534088}
   m_Layer: 0
-  m_Name: HairStrandBlockade
+  m_Name: HairStrandVertical
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -160,7 +160,7 @@ Transform:
   m_GameObject: {fileID: 3250784243339750217}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.1793576, y: 3.0186992, z: -0.034970704}
+  m_LocalPosition: {x: 0, y: 0, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -195,7 +195,7 @@ GameObject:
   - component: {fileID: 9049193755349775942}
   m_Layer: 8
   m_Name: Point1
-  m_TagString: Untagged
+  m_TagString: Parryable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -209,7 +209,7 @@ Transform:
   m_GameObject: {fileID: 5321499599266430608}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 5, z: 0}
+  m_LocalPosition: {x: 0, y: 1.5, z: 0}
   m_LocalScale: {x: 5, y: 5, z: 5}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -319,7 +319,7 @@ GameObject:
   - component: {fileID: 2131199122519793115}
   m_Layer: 8
   m_Name: Point2
-  m_TagString: Untagged
+  m_TagString: Parryable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -333,7 +333,7 @@ Transform:
   m_GameObject: {fileID: 5596363246895220323}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -5, z: 0}
+  m_LocalPosition: {x: 0, y: -1.5, z: 0}
   m_LocalScale: {x: 5, y: 5, z: 5}
   m_ConstrainProportionsScale: 0
   m_Children: []

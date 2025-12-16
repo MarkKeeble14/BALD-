@@ -14,7 +14,7 @@ public class HazardSpawn
         spawned.transform.position = new Vector3(
             parent.transform.position.x, 
             RandomHelper.RandomFloat(rangeWhereCanSpawn), 
-            parent.transform.position.z);
+            -1);
 
         // Track the hazard
         parent.GetComponent<TrackAttachedHazards>().AddSpawnedHazard(spawned);

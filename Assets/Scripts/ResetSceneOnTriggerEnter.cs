@@ -9,7 +9,7 @@ public class ResetSceneOnTriggerEnter : MonoBehaviour
     {
         if (LayerMaskHelper.IsInLayerMask(collision.gameObject, layerMask))
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            GameManager._Instance.DieState();
         }
     }
 }
